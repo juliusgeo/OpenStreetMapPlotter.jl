@@ -1,6 +1,6 @@
 module OpenStreetMapParser2
 using LightXML
-
+using HTTP
 
 struct Node
     x::Float64
@@ -45,6 +45,15 @@ function open_file(filepath::String)
 	return xroot
 end
 
+function open_bbox(bbox::Tuple)
+	minlon = bbox[1]
+	maxlon = bbox[3]
+	minlat = bbox[2]
+	maxlat = bbox[4]
+	url = "http://overpass-api.de/api/map?bbox=$(minlon),$(minlat),$(maxlon),$(maxlat)"
+	r = HTTP.request("GET", url)
+	return root(parse_string(String(r.body)))
+end
 function parse_nodes(xroot::XMLElement)
     node_arr = Node[]
     for node in xroot["node"]
@@ -127,6 +136,6 @@ function parse_relations(xroot::XMLElement, way_arr::Array{Way}, node_arr::Array
     return rel_arr
 end
 
-export open_file, parse_nodes, parse_ways, parse_relations, Node, Tag, Way
+export open_file, open_bbox, parse_nodes, parse_ways, parse_relations, Node, Tag, Way
 
 end
