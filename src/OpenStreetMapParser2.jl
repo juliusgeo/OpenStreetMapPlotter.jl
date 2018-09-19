@@ -28,7 +28,7 @@ end
 
 
 function open_file(filepath::String)
-	xdoc = parse_file("map.osm")
+	xdoc = parse_file(filepath)
 	xroot = root(xdoc)  # an instance of XMLElement
 	return xroot
 end
