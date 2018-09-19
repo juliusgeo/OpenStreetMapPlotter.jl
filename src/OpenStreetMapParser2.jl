@@ -81,7 +81,7 @@ function parse_ways(xroot::XMLElement)
     for way in xroot["way"]
         cur_way = Way()
         cur_way.id = attribute(way, "id")
-        cur_way.visible = lowercase(attribute(way, "visible")) == "true"
+        cur_way.visible = attribute(way, "visible") == "true"
         cur_way.version = parse(Int, attribute(way, "version"))
         cur_way.changeset = attribute(way, "changeset")
         cur_way.timestamp = attribute(way, "timestamp")
@@ -134,6 +134,11 @@ function parse_relations(xroot::XMLElement, way_arr::Array{Way}, node_arr::Array
         push!(rel_arr, cur_rel)
     end
     return rel_arr
+end
+
+function plot_ways(way_arr::Array{Way})
+	#placeholder for now
+	#plot([i.x for i in way_arr[1].nodes], [i.y for i in way_arr[1].nodes])
 end
 
 export open_file, open_bbox, parse_nodes, parse_ways, parse_relations, Node, Tag, Way
