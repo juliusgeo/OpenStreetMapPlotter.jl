@@ -1,0 +1,6 @@
+authors = ["Julius Park <juliusgeo@gmail.com>"]
+name = "OpenStreetMapParser2"
+uuid = "592efc3e-bbae-11e8-3693-5f6d508330d3"
+version = "0.1.0"
+
+[deps]
