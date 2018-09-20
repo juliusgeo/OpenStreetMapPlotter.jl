@@ -27,9 +27,9 @@ version = "0.5.6"
 
 [[ColorTypes]]
 deps = ["FixedPointNumbers", "Random", "Test"]
-git-tree-sha1 = "0e3209ba7418aed732e5c3818076b4400ee36c08"
+git-tree-sha1 = "f73b0e10f2a5756de7019818a41654686da06b09"
 uuid = "3da002f7-5984-5a60-b8a6-cbb66c0b333f"
-version = "0.7.4"
+version = "0.7.5"
 
 [[Colors]]
 deps = ["ColorTypes", "FixedPointNumbers", "InteractiveUtils", "Pkg", "Printf", "Reexport", "Test"]
@@ -179,10 +179,10 @@ uuid = "77ba4419-2d1f-58cd-9bb1-8ffee604a2e3"
 version = "0.3.2"
 
 [[OrderedCollections]]
-deps = ["InteractiveUtils", "Pkg", "Random", "Serialization", "Test"]
-git-tree-sha1 = "27af6dc22697bf20ace8e3a45f404a34eaf0b819"
+deps = ["Pkg", "Random", "Serialization", "Test"]
+git-tree-sha1 = "41da1edba028376b58520ca01d9a41e29f855d55"
 uuid = "bac558e1-5e72-5ebc-8fee-abe8a469f55d"
-version = "1.0.0"
+version = "1.0.1"
 
 [[Pkg]]
 deps = ["Dates", "LibGit2", "Markdown", "Printf", "REPL", "Random", "SHA", "UUIDs"]
@@ -208,9 +208,9 @@ version = "0.2.0"
 
 [[Revise]]
 deps = ["Distributed", "FileWatching", "InteractiveUtils", "LibGit2", "OrderedCollections", "Pkg", "REPL", "Random", "Test", "UUIDs", "Unicode"]
-git-tree-sha1 = "48ad8dcdacf24185eb1bc4253a17dc39e1485079"
+git-tree-sha1 = "e45f79d83a61ee6fc229b22df6836d18b6dcb89e"
 uuid = "295af30f-e4ad-537b-8983-00126c2a3abe"
-version = "0.7.10"
+version = "0.7.11"
 
 [[SHA]]
 uuid = "ea8e919c-243c-51af-8825-aaa63cd721ce"
@@ -270,6 +270,6 @@ version = "0.4.2"
 
 [[Winston]]
 deps = ["Cairo", "Colors", "Compat", "Dates", "Graphics", "Gtk", "IniFile", "LinearAlgebra", "NaNMath", "Pkg", "Printf", "REPL", "Random", "Reexport", "SparseArrays", "StatsBase"]
-git-tree-sha1 = "0c7e0522d0e88b5cc139d9e43c851e7727ea261f"
+git-tree-sha1 = "25d9534ec5ad10a6403383fe98ee0fe4e9ecec49"
 uuid = "bd07be1c-e76f-5ff0-9c0b-f51ef45303c6"
-version = "0.14.0"
+version = "0.14.1"
