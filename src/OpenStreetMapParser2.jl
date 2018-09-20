@@ -9,9 +9,10 @@ struct Node
     id::String
 end
 
-struct Tag
-    key::String
-    val::String
+struct Style
+	color::UInt
+	width::Int
+	spec::String
 end
 
 mutable struct Way
@@ -23,7 +24,7 @@ mutable struct Way
     user::String
     uid::String
     nodes::Array{Node}
-    tags::Array{Tag}
+    tags::Dict
     Way() = new()
 end
 
@@ -36,7 +37,7 @@ mutable struct Relation
     user::String
     uid::String
     members::Array{Any}
-    tags::Array{Tag}
+    tags::Dict
     Relation() = new()
 end
 
@@ -92,9 +93,9 @@ function parse_ways(xroot::XMLElement)
         for node in way["nd"]
             push!(cur_way.nodes, find_node(attribute(node, "ref"), node_arr))
         end
-        cur_way.tags = []
+        cur_way.tags = Dict()
         for tag in way["tag"]
-            push!(cur_way.tags, Tag(attribute(tag, "k"), attribute(tag, "v")))
+        	cur_way.tags[attribute(tag, "k")] = attribute(tag, "v")
         end
         push!(way_arr, cur_way)
     end
@@ -128,9 +129,9 @@ function parse_relations(xroot::XMLElement, way_arr::Array{Way}, node_arr::Array
             	end
             end
         end
-        cur_rel.tags = []
+        cur_rel.tags = Dict()
         for tag in rel["tag"]
-            push!(cur_rel.tags, Tag(attribute(tag, "k"), attribute(tag, "v")))
+            cur_rel.tags[attribute(tag, "k")] = attribute(tag, "v")
         end
         push!(rel_arr, cur_rel)
     end
@@ -139,14 +140,48 @@ end
 
 function plot_ways(way_arr::Array{Way})
 	for way in way_arr
-    	p = plot([i.x for i in way.nodes], [i.y for i in way.nodes], "-")
+		style=get_way_style(way.tags)
+    	p = plot([i.x for i in way.nodes], [i.y for i in way.nodes], style.spec, color=style.color, linewidth=style.width)
     	hold(true)
     	display(p)
     end
-    
-
+    hold(false)
 end
-
+way_styles = Dict(
+	"motorway" => Style(0xe891a1, 3, "-"),
+	"trunk" => Style(0xf9b29c, 5, "-"),
+	"primary" => Style(0xFCD6A4, 5, "-"),
+	"secondary" => Style(0xF6F9BE, 4, "-"),
+	"tertiary" => Style(0xFEFEFE, 3, "-"),
+	"unclassified" => Style(0xF1EEE8, 2, "-"),
+	"residential" => Style(0xF1EEE8, 2, "-"),
+	"service" => Style(0x007CFF, 1, "-"),
+	"motorway_link" => Style(0xe891a1, 2, "-"),
+	"trunk_link" => Style(0xf9b29c, 2, "-"),
+	"primary_link" => Style(0xFCD6A4, 2, "-"),
+	"secondary_link" => Style(0xF6F9BE, 2, "-"),
+	"tertiary_link" => Style(0xFEFEFE, 2, "-"),
+	"living_street" => Style(0xF1EEE8, 2, "-"),
+	"pedestrian" => Style(0x007CFF, 2, "-"),
+	"track" => Style(0x007CFF, 1, ":"),
+	"bus_guideway" => Style(0x007CFF, 1, ":"),
+	"escape" => Style(0x007CFF, 1, ":"),
+	"raceway" => Style(0x007CFF, 1, ":"),
+	"road" => Style(0x007CFF, 1, ":"),
+	"footway" => Style(0x007CFF, 1, ":"),
+	"bridleway" => Style(0x007CFF, 1, ":"),
+	"steps" => Style(0x007CFF, 1, ":"),
+	"path" => Style(0x007CFF, 1, ":")
+)
+function get_way_style(tags::Dict)
+	if haskey(tags, "highway")
+		if haskey(way_styles, tags["highway"])
+			#println(tags["highway"])
+			return way_styles[tags["highway"]]
+		end
+	end
+	return Style(0x000000, 1, "-")
+end
 export open_file, open_bbox, parse_nodes, parse_ways, parse_relations, plot_ways, Node, Tag, Way
 
 end
