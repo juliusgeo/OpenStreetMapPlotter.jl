@@ -1,6 +1,7 @@
 module OpenStreetMapParser2
 using LightXML
 using HTTP
+using Winston
 
 struct Node
     x::Float64
@@ -137,10 +138,15 @@ function parse_relations(xroot::XMLElement, way_arr::Array{Way}, node_arr::Array
 end
 
 function plot_ways(way_arr::Array{Way})
-	#placeholder for now
-	#plot([i.x for i in way_arr[1].nodes], [i.y for i in way_arr[1].nodes])
+	for way in way_arr
+    	p = plot([i.x for i in way.nodes], [i.y for i in way.nodes], "-")
+    	hold(true)
+    	display(p)
+    end
+    
+
 end
 
-export open_file, open_bbox, parse_nodes, parse_ways, parse_relations, Node, Tag, Way
+export open_file, open_bbox, parse_nodes, parse_ways, parse_relations, plot_ways, Node, Tag, Way
 
 end
