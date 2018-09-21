@@ -37,6 +37,7 @@ end
 function find_node(id::String, node_arr::Array{Node})
     return node_arr[findfirst(x -> x.id == id, node_arr)]
 end
+
 function find_way(id::String, way_arr::Array{Way})
 	try
     	return way_arr[findfirst(x -> x.id == id, way_arr)]
@@ -119,7 +120,15 @@ function plot_ways(way_arr::Array{Way}, bbox::Tuple; width::Int64=500, roads_onl
 	p = FramedPlot()
 	for way in way_arr
 		style=get_way_style(way.tags)
-    	plot(p, [i.x for i in way.nodes], [i.y for i in way.nodes], style.spec, color=style.color, linewidth=style.width, xrange=(minlon, maxlon), yrange=(minlat, maxlat))
+		if haskey(way.tags, "building")
+			split = findmax([i.x for i in way.nodes])[2]
+			topside = way.nodes[1:split]
+			bottomside = way.nodes[split:end]
+			f = FillBetween([i.x for i in topside], [i.y for i in topside], [i.x for i in bottomside], [i.y for i in bottomside], fillcolor = "red")
+			Winston.add(p, f)		
+		else
+    		plot(p, [i.x for i in way.nodes], [i.y for i in way.nodes], style.spec, color=style.color, linewidth=style.width, xrange=(minlon, maxlon), yrange=(minlat, maxlat))
+    	end
     end
     display(p)
 end
