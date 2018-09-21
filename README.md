@@ -1,7 +1,6 @@
 # OpenStreetMapParser2.jl
 ## About
-This package was born because I tried to use Julia's [OpenStreetMap.jl](https://github.com/tedsteiner/OpenStreetMap.jl) library, and it does not work in Julia 1.0, which is the latest release. In addition, it did not have quite a few features which I thought were important.
-To remedy this, I decided to make my own OpenStreetMap library which had features that I thought important.
+This package was born because I tried to use Julia's [OpenStreetMap.jl](https://github.com/tedsteiner/OpenStreetMap.jl) library, but it does not work in Julia 1.0, which is the latest release. In addition, it did not have a few features which I thought were important. I thought about contributing to OpenStreetMap.jl, but it already used a lot of legacy code in the versions aimed for Julia v0.3, so I thought it would be better to just start from scratch.
 
 ## Features
 It can parse OpenStreetMap maps from either a bounding box (which then fetches the map from the [Overpass API](https://wiki.openstreetmap.org/wiki/Overpass_API)) or from a .osm file. 
@@ -11,6 +10,7 @@ In addition, it has a plotting function which uses [Winston.jl](https://github.c
 The main ways in which this package is better than OpenStreetMap.jl:
 * The graphing function is able to draw buildings and other OSM objects like parks, rivers, etc, as polygons rather than just as outlines.
 * Because this package is primarily focused on extracting data from the OSM objects, rather than on geometry, the structs are much easier to understand because everything is in WGS84 projection. 
+* In OpenStreetMap.jl, smaller streets that adjoin a larger street will sometimes be drawn over the larger street. This package delays the drawing of motorways, trunks, and primary through tertiary ways so that they display correctly when plotted.
 
 The styling for all the different object types is defined in styles.jl, which is composed of a few dictionaries that map OSM tags to Style objects. These dicts are accessible to the user, so you can easily change the styling as you wish.
 
