@@ -1,10 +1,9 @@
-
 highway_styles = Dict(
-	"motorway" => Style(0xe891a1, 3, "-"),
-	"trunk" => Style(0xf9b29c, 5, "-"),
-	"primary" => Style(0xFCD6A4, 5, "-"),
-	"secondary" => Style(0xF6F9BE, 4, "-"),
-	"tertiary" => Style(0xFEFEFE, 3, "-"),
+	"motorway" => Style(0x0015ff, 6, "-"), #bright blue
+	"trunk" => Style(0x9000ff, 5, "-"), #bright purple
+	"primary" => Style(0xff6868, 5, "-"), #orange
+	"secondary" => Style(0xfc4b4b, 4, "-"), #orange-ish red
+	"tertiary" => Style(0xfc3232, 3, "-"), #red
 	"unclassified" => Style(0xF1EEE8, 2, "-"),
 	"residential" => Style(0xF1EEE8, 2, "-"),
 	"service" => Style(0x007CFF, 1, "-"),
@@ -32,22 +31,47 @@ building_styles = Dict(
 	"garage" => Style(0x91f2ce, 1, "-"),
 	"apartment" => Style(0x91f2ce, 1, "-"), #all residential stuff is greenish
 	"hut" => Style(0xe891a1, 1, "-"),
-	"industrial" => Style(0xe891a1, 1, "-"),
+	"industrial" => Style(0x876d6c, 1, "-"),
 	"detached" => Style(0xe891a1, 1, "-"),
-	"shed" => Style(0xe891a1, 1, "-"),
-	"commercial" => Style(0xe891a1, 1, "-"),
+	"shed" => Style(0x876d6c, 1, "-"),
+	"commercial" => Style(0xfcb5b3, 1, "-"),
 	"terrace" => Style(0xe891a1, 1, "-"),
 	"garages" => Style(0xe891a1, 1, "-"),
-	"school" => Style(0x857aff, 1, "-"), #schools are blue
-	"construction" => Style(0xe891a1, 1, "-"),
+	"school" => Style(0xb2effc, 1, "-"), #schools are blue
+	"construction" => Style(0xf2d2d8, 1, "-"),
 )
 waterway_styles = Dict(
-	"stream" => Style(0x609af7, 1, "-"),
+	"stream" => Style(0x609af7, 3, "-"),
 	"ditch" => Style(0x609af7, 1, "-"),
-	"river" => Style(0x609af7, 1, "-"),
+	"river" => Style(0x609af7, 5, "-"),
 	"drain" => Style(0x609af7, 1, "-"),
-	"riverbank" => Style(0x609af7, 1, "-"), #all residential stuff is greenish
+	"riverbank" => Style(0x609af7, 1, "-"),
 	"canal" => Style(0x609af7, 1, "-"),
 	"other" => Style(0x609af7, 1, "-"),
 )
+leisure_styles = Dict(
+	"pitch" => Style(0x30bc0d, 2, "-"),
+	"swimming_pool" => Style(0x609af7, 2, "-"),
+	"park" => Style(0x30bc0d, 2, "-"),
+	"playground" => Style(0x30bc0d, 1, "-"),
+	"garden" => Style(0x30bc0d, 1, "-"),
+	"sports_centre" => Style(0x30bc0d, 1, "-"),
+	"other" => Style(0x30bc0d, 1, "-"),
+)
+tag2style = Dict(
+	"waterway" => waterway_styles,
+	"building" => building_styles,
+	"highway" => highway_styles,
+	"leisure" => leisure_styles,
+)
 
+function get_way_style(tags::Dict)
+	for tag in ["waterway", "building", "highway", "leisure"]
+		if haskey(tags, tag)
+			if haskey(tag2style[tag], tags[tag])
+				return tag2style[tag][tags[tag]]
+			end
+		end
+	end
+	return Style(0x808080, 1, "-")
+end
