@@ -6,8 +6,6 @@ using Winston
 include("structs.jl")
 include("styles.jl")
 
-
-
 function open_file(filepath::String)
 	xdoc = parse_file(filepath)
 	xroot = root(xdoc)  # an instance of XMLElement
@@ -67,7 +65,9 @@ function parse_ways(xroot::XMLElement)
         end
         push!(way_arr, cur_way)
     end
-    return way_arr
+    bounds = xroot["bounds"][1]
+    bbox = (parse(Float64, attribute(bounds, "minlon")), parse(Float64, attribute(bounds, "minlat")), parse(Float64, attribute(bounds, "maxlon")), parse(Float64, attribute(bounds, "maxlat")))
+    return way_arr, bbox
 end
 
 function parse_relations(xroot::XMLElement, way_arr::Array{Way}, node_arr::Array{Node})
@@ -106,7 +106,7 @@ function parse_relations(xroot::XMLElement, way_arr::Array{Way}, node_arr::Array
     return rel_arr
 end
 
-function plot_ways(way_arr::Array{Way}, bbox::Tuple; width::Int64=500, roads_only::Bool=false)
+function plot_ways(way_arr::Array{Way}; bbox::Tuple = nothing, width::Int64=500, roads_only::Bool=false)
 	minlon = bbox[1]
 	maxlon = bbox[3]
 	minlat = bbox[2]
@@ -118,19 +118,33 @@ function plot_ways(way_arr::Array{Way}, bbox::Tuple; width::Int64=500, roads_onl
 
 	fignum = Winston.figure(name="OpenStreetMap Plot", width=width, height=round(Int, width/aspect_ratio))
 	p = FramedPlot()
+	draw_later = []
 	for way in way_arr
 		style=get_way_style(way.tags)
-		if haskey(way.tags, "building")
+		if true in [x in keys(way.tags) for x=["building", "waterway", "leisure"]]
 			split = findmax([i.x for i in way.nodes])[2]
 			topside = way.nodes[1:split]
 			bottomside = way.nodes[split:end]
-			f = FillBetween([i.x for i in topside], [i.y for i in topside], [i.x for i in bottomside], [i.y for i in bottomside], fillcolor = "red")
-			Winston.add(p, f)		
+			f = FillBetween([i.x for i in topside], [i.y for i in topside], [i.x for i in bottomside], [i.y for i in bottomside], fillcolor = style.color)
+			Winston.add(p, f)
+		elseif haskey(way.tags, "highway")
+			if way.tags["highway"] in ["motorway", "trunk", "primary", "secondary", "tertiary"]
+				println("Drawing deffered")
+				push!(draw_later, way)
+			else
+				plot(p, [i.x for i in way.nodes], [i.y for i in way.nodes], style.spec, color=style.color, linewidth=style.width, xrange=(minlon, maxlon), yrange=(minlat, maxlat))
+			end
 		else
     		plot(p, [i.x for i in way.nodes], [i.y for i in way.nodes], style.spec, color=style.color, linewidth=style.width, xrange=(minlon, maxlon), yrange=(minlat, maxlat))
     	end
     end
+    for way in draw_later
+    	style=get_way_style(way.tags)
+    	plot(p, [i.x for i in way.nodes], [i.y for i in way.nodes], style.spec, color=style.color, linewidth=style.width, xrange=(minlon, maxlon), yrange=(minlat, maxlat))
+    end
+    savefig(p, "map_out.svg", width=width, height=round(Int, width/aspect_ratio))
     display(p)
+
 end
 
 export open_file, open_bbox, parse_nodes, parse_ways, parse_relations, plot_ways, Node, Tag, Way
