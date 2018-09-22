@@ -8,6 +8,7 @@ struct Style
 	color::UInt
 	width::Int
 	spec::String
+    polygon::Bool
 end
 
 mutable struct Way
