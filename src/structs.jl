@@ -4,7 +4,7 @@ struct Node
     id::String
 end
 
-struct Style
+mutable struct Style
 	color::UInt
 	width::Int
 	spec::String

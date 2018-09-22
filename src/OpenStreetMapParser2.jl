@@ -121,11 +121,18 @@ function plot_ways(way_arr::Array{Way}; bbox::Tuple = nothing, width::Int64=500,
 	draw_later = []
 	for way in way_arr
 		style=get_way_style(way.tags)
+		if way.nodes[1] == way.nodes[end]
+			style.polygon = true
+			println(true)
+		else
+			style.polygon = false
+			println(false)
+		end
 		if style.polygon == true
 			split = findmax([i.x for i in way.nodes])[2]
 			start = findmin([i.x for i in way.nodes])[2]
-			topside = way.nodes[start:split]
-			bottomside = vcat(way.nodes[split:end], way.nodes[1:start])
+			topside = way.nodes[1:split]
+			bottomside = way.nodes[split:end]
 			f = FillBetween([i.x for i in topside], [i.y for i in topside], [i.x for i in bottomside], [i.y for i in bottomside], fillcolor = style.color, linewidth=style.width)
 			Winston.add(p, f)
 		elseif haskey(way.tags, "highway")
