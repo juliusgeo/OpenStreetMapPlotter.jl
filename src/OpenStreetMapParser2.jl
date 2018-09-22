@@ -148,6 +148,13 @@ function plot_ways(way_arr::Array{Way}; bbox::Tuple = nothing, width::Int64=500,
     end
     for way in draw_later
     	style=get_way_style(way.tags)
+    	if way.nodes[1] == way.nodes[end]
+			style.polygon = true
+			println(true)
+		else
+			style.polygon = false
+			println(false)
+		end
     	plot(p, [i.x for i in way.nodes], [i.y for i in way.nodes], style.spec, color=style.color, linewidth=style.width, xrange=(minlon, maxlon), yrange=(minlat, maxlat))
     end
     savefig(p, "map_out.svg", width=width, height=round(Int, width/aspect_ratio))

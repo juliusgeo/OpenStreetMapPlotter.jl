@@ -431,5 +431,5 @@ function get_way_style(tags::Dict)
 			end
 		end
 	end
-	return Style(0x808080, 1, "-", false)
+	return Style(0xD3D3D3, 1, "-", false)
 end
