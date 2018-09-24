@@ -164,23 +164,21 @@ end
 function save_json(way_arr::Array{Way}, filepath::String)
 	f=open(filepath, "w")
 	write(f, "{\n\"type\": \"FeatureCollection\",\n\"features\": [\n")
-	first1 = true
+	flags = [true, true, true]
 	for way in way_arr
-		if first1 == false
+		if flags[1] == false
 			write(f, ",\n")
 		end
 		write(f, "{ \"type\": \"Feature\", \"properties\": {")
-		first1 = false
-		first2 = true
+		flags[1] = false
 		for key in keys(way.tags)
 			key = key
 			val = way.tags[key]
-			if first2 == false
+			if flags[2] == false
 				write(f, ",")
 			end
-			first2 = false
+			flags[2] = false
 			if in('"', val)
-				print("contains double quotes")
 				write(f, "\"$key\":\"$(replace(val, r"\"" => "\\\""))\"")
 			else
 				write(f, "\"$key\":\"$val\"")
@@ -194,14 +192,13 @@ function save_json(way_arr::Array{Way}, filepath::String)
 			write(f, "}, \"geometry\": { \"type\": \"Point\", \"coordinates\":")
 		end
 		write(f, "[ [")
-		first3 = true
 		for coord in way.nodes
 			lon = coord.x
 			lat = coord.y
-			if first3 == false
+			if flags[3] == false
 				write(f, ", ")
 			end
-			first3 = false
+			flags[3] = false
 			write(f, "[ $lon, $lat]")
 		end
 		write(f, "]] }}\n")
