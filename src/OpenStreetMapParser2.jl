@@ -157,12 +157,50 @@ function plot_ways(way_arr::Array{Way}; bbox::Tuple = nothing, width::Int64=500,
 		end
     	plot(p, [i.x for i in way.nodes], [i.y for i in way.nodes], style.spec, color=style.color, linewidth=style.width, xrange=(minlon, maxlon), yrange=(minlat, maxlat))
     end
-    savefig(p, "map_out.svg", width=width, height=round(Int, width/aspect_ratio))
+    #savefig(p, "map_out.svg", width=width, height=round(Int, width/aspect_ratio))
     display(p)
-
 end
 
-export open_file, open_bbox, parse_nodes, parse_ways, parse_relations, plot_ways, Node, Tag, Way, highway_styles, building_styles, waterway_styles
+function save_json(way_arr::Array{Way}, filepath::String)
+	f=open(filepath, "w")
+	write(f, "{\n\"type\": \"FeatureCollection\",\n\"features\": [\n")
+	for way in way_arr[1:10]
+		write(f, "{ \"type\": \"Feature\", \"properties\": {")
+		first = true
+		for key in keys(way.tags)
+			key = key
+			val = way.tags[key]
+			if first == false
+				write(f, ",")
+			end
+			first = false
+			if in('"', val)
+				print("contains double quotes")
+				write(f, "\"$key\":\"$(replace(val, r"\"" => "\\\""))\"")
+			else
+				write(f, "\"$key\":\"$val\"")
+			end
+		end
+		write(f, "}, \"geometry\": { \"type\": \"Polygon\", \"coordinates\":")
+	
+		write(f, "[ [")
+		first = true
+		for coord in way.nodes
+			lon = coord.x
+			lat = coord.y
+			if first == false
+				write(f, ", ")
+			end
+			first = false
+			write(f, "[ $lon, $lat]")
+		end
+		write(f, "]] }},\n")
+	end
+	
+	write(f, "}\n]\n}")
+	close(f)
+end
+export open_file, open_bbox, parse_nodes, parse_ways, parse_relations, plot_ways, save_json, Node, Tag, Way, highway_styles, building_styles, waterway_styles
 
 
 end
