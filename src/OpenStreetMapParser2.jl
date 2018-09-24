@@ -164,16 +164,21 @@ end
 function save_json(way_arr::Array{Way}, filepath::String)
 	f=open(filepath, "w")
 	write(f, "{\n\"type\": \"FeatureCollection\",\n\"features\": [\n")
-	for way in way_arr[1:10]
+	first1 = true
+	for way in way_arr
+		if first1 == false
+			write(f, ",\n")
+		end
 		write(f, "{ \"type\": \"Feature\", \"properties\": {")
-		first = true
+		first1 = false
+		first2 = true
 		for key in keys(way.tags)
 			key = key
 			val = way.tags[key]
-			if first == false
+			if first2 == false
 				write(f, ",")
 			end
-			first = false
+			first2 = false
 			if in('"', val)
 				print("contains double quotes")
 				write(f, "\"$key\":\"$(replace(val, r"\"" => "\\\""))\"")
@@ -181,23 +186,28 @@ function save_json(way_arr::Array{Way}, filepath::String)
 				write(f, "\"$key\":\"$val\"")
 			end
 		end
-		write(f, "}, \"geometry\": { \"type\": \"Polygon\", \"coordinates\":")
-	
+		if way.nodes[1] == way.nodes[end]
+			write(f, "}, \"geometry\": { \"type\": \"Polygon\", \"coordinates\":")
+		elseif length(way.nodes) > 1
+			write(f, "}, \"geometry\": { \"type\": \"LineString\", \"coordinates\":")
+		else
+			write(f, "}, \"geometry\": { \"type\": \"Point\", \"coordinates\":")
+		end
 		write(f, "[ [")
-		first = true
+		first3 = true
 		for coord in way.nodes
 			lon = coord.x
 			lat = coord.y
-			if first == false
+			if first3 == false
 				write(f, ", ")
 			end
-			first = false
+			first3 = false
 			write(f, "[ $lon, $lat]")
 		end
-		write(f, "]] }},\n")
+		write(f, "]] }}\n")
 	end
 	
-	write(f, "}\n]\n}")
+	write(f, "\n]\n}")
 	close(f)
 end
 export open_file, open_bbox, parse_nodes, parse_ways, parse_relations, plot_ways, save_json, Node, Tag, Way, highway_styles, building_styles, waterway_styles
