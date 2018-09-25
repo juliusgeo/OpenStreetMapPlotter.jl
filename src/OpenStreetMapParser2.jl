@@ -123,10 +123,8 @@ function plot_ways(way_arr::Array{Way}; bbox::Tuple = nothing, width::Int64=500,
 		style=get_way_style(way.tags)
 		if way.nodes[1] == way.nodes[end]
 			style.polygon = true
-			println(true)
 		else
 			style.polygon = false
-			println(false)
 		end
 		if style.polygon == true
 			split = findmax([i.x for i in way.nodes])[2]
@@ -137,7 +135,6 @@ function plot_ways(way_arr::Array{Way}; bbox::Tuple = nothing, width::Int64=500,
 			Winston.add(p, f)
 		elseif haskey(way.tags, "highway")
 			if way.tags["highway"] in ["motorway", "trunk", "primary", "secondary", "tertiary"]
-				println("Drawing deffered")
 				push!(draw_later, way)
 			else
 				plot(p, [i.x for i in way.nodes], [i.y for i in way.nodes], style.spec, color=style.color, linewidth=style.width, xrange=(minlon, maxlon), yrange=(minlat, maxlat))
@@ -150,10 +147,8 @@ function plot_ways(way_arr::Array{Way}; bbox::Tuple = nothing, width::Int64=500,
     	style=get_way_style(way.tags)
     	if way.nodes[1] == way.nodes[end]
 			style.polygon = true
-			println(true)
 		else
 			style.polygon = false
-			println(false)
 		end
     	plot(p, [i.x for i in way.nodes], [i.y for i in way.nodes], style.spec, color=style.color, linewidth=style.width, xrange=(minlon, maxlon), yrange=(minlat, maxlat))
     end
@@ -188,14 +183,22 @@ function save_json(way_arr::Array{Way}, filepath::String)
 				write(f, "\"$key\":\"$val\"")
 			end
 		end
+		startarraystr = ""
+		endarraystr = ""
 		if way.nodes[1] == way.nodes[end]
 			write(f, "}, \"geometry\": { \"type\": \"Polygon\", \"coordinates\":")
-		elseif length(way.nodes) > 1
-			write(f, "}, \"geometry\": { \"type\": \"LineString\", \"coordinates\":")
-		else
+			startarraystr = "[ ["
+			endarraystr = "]] }}\n"
+		elseif length(way.nodes) == 1
 			write(f, "}, \"geometry\": { \"type\": \"Point\", \"coordinates\":")
+			startarraystr = ""
+			endarraystr = "}}\n"
+		else
+			write(f, "}, \"geometry\": { \"type\": \"LineString\", \"coordinates\":")
+			startarraystr = "["
+			endarraystr = "] }}\n"
 		end
-		write(f, "[ [")
+		write(f, startarraystr)
 		flags[3]=true
 		for coord in way.nodes
 			lon = coord.x
@@ -208,7 +211,7 @@ function save_json(way_arr::Array{Way}, filepath::String)
 			flags[3] = false
 			write(f, "[ $lon, $lat]")
 		end
-		write(f, "]] }}\n")
+		write(f, endarraystr)
 	end
 	
 	write(f, "\n]\n}")
