@@ -1,4 +1,4 @@
-# OpenStreetMapParser2.jl
+# OpenStreetMap2.jl
 ## About
 This package was born because I tried to use Julia's [OpenStreetMap.jl](https://github.com/tedsteiner/OpenStreetMap.jl) library, but it does not work in Julia 1.0, which is the latest release. In addition, it did not have a few features which I thought were important. I thought about contributing to OpenStreetMap.jl, but it already used a lot of legacy code in the versions aimed for Julia v0.3, so I thought it would be better to just start from scratch.
 
