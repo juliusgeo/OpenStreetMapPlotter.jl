@@ -155,7 +155,32 @@ function plot_ways(way_arr::Array{Way}; bbox::Tuple = nothing, width::Int64=500,
     #savefig(p, "map_out.svg", width=width, height=round(Int, width/aspect_ratio))
     display(p)
 end
+function sort_clockwise(nodes::Array{Node})
+	center = center_of_points(nodes)
+	return sort(nodes, lt=(a, b)->is_less(a, b, center))
+end
 
+function is_less(a, b, center)
+	if a.x >= 0 && b.x < 0
+		return true
+	elseif a.x == 0 and b.x == 0
+		return a.y >b.y
+	end
+
+	det = (a.x - center[1]) * (b.y - center[2]) - (b.x - center[2]) * (a.y - center[2])
+	if det < 0
+		return true
+	elseif det > 0 
+		return false
+	end
+
+	d1 = (a.x - center[1]) * (a.x - center[1]) + (a.y - center[2]) * (a.y - center[2])
+	d2 = (b.x - center[1]) * (b.x - center[1]) + (b.y - center[2]) * (b.y - center[2])
+	return d1 > d2
+end
+function center_of_points(nodes::Array{Node})
+	return (mean([i.x for i in nodes]), mean([i.y for i in nodes]))
+end
 function save_json(way_arr::Array{Way}, filepath::String)
 	f=open(filepath, "w")
 	write(f, "{\n\"type\": \"FeatureCollection\",\n\"features\": [\n")
