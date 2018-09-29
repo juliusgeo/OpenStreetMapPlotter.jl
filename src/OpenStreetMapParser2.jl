@@ -2,7 +2,7 @@ module OpenStreetMapParser2
 using LightXML
 using HTTP
 using Winston
-
+using Statistics
 include("structs.jl")
 include("styles.jl")
 
@@ -155,15 +155,15 @@ function plot_ways(way_arr::Array{Way}; bbox::Tuple = nothing, width::Int64=500,
     #savefig(p, "map_out.svg", width=width, height=round(Int, width/aspect_ratio))
     display(p)
 end
-function sort_clockwise(nodes::Array{Node})
+function sort_counterclockwise(nodes::Array{Node})
 	center = center_of_points(nodes)
-	return sort(nodes, lt=(a, b)->is_less(a, b, center))
+	return sort(nodes, lt=(a, b)->!is_less(a, b, center))
 end
 
 function is_less(a, b, center)
-	if a.x >= 0 && b.x < 0
+	if a.x-center[1] >= 0 && b.x-center[1] < 0
 		return true
-	elseif a.x == 0 and b.x == 0
+	elseif a.x -center[1] == 0 && b.x-center[1] == 0
 		return a.y >b.y
 	end
 
@@ -210,22 +210,28 @@ function save_json(way_arr::Array{Way}, filepath::String)
 		end
 		startarraystr = ""
 		endarraystr = ""
+		sorted_arr = []
 		if way.nodes[1] == way.nodes[end]
 			write(f, "}, \"geometry\": { \"type\": \"Polygon\", \"coordinates\":")
 			startarraystr = "[ ["
 			endarraystr = "]] }}\n"
+			sorted_arr = sort_counterclockwise(way.nodes)
+			sorted_arr = vcat(sorted_arr, sorted_arr[1])
 		elseif length(way.nodes) == 1
 			write(f, "}, \"geometry\": { \"type\": \"Point\", \"coordinates\":")
 			startarraystr = ""
 			endarraystr = "}}\n"
+			sorted_arr = way.nodes
 		else
 			write(f, "}, \"geometry\": { \"type\": \"LineString\", \"coordinates\":")
 			startarraystr = "["
 			endarraystr = "] }}\n"
+			sorted_arr = sort_counterclockwise(way.nodes)
 		end
 		write(f, startarraystr)
 		flags[3]=true
-		for coord in way.nodes
+		
+		for coord in sorted_arr
 			lon = coord.x
 			lat = coord.y
 			if flags[3] == true
