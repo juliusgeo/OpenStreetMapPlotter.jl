@@ -1,7 +1,7 @@
 name = "OpenStreetMapParser2"
-uuid = "592efc3e-bbae-11e8-3693-5f6d508330d3"
+uuid = "89d9e4e6-be45-5c0a-ba17-61b0492e54d3"
 authors = ["Julius Park <juliusgeo@gmail.com>"]
-version = "0.1.0"
+version = "0.0.1"
 
 [deps]
 HTTP = "cd3eb016-35fb-5094-929b-558a96fad6f3"

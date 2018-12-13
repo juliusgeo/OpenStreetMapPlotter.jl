@@ -173,7 +173,6 @@ function is_less(a, b, center)
 	elseif det > 0 
 		return false
 	end
-
 	d1 = (a.x - center[1]) * (a.x - center[1]) + (a.y - center[2]) * (a.y - center[2])
 	d2 = (b.x - center[1]) * (b.x - center[1]) + (b.y - center[2]) * (b.y - center[2])
 	return d1 > d2
