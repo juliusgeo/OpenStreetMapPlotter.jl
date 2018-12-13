@@ -1,2 +1,2 @@
-import OpenStreetMapParser2
+import OpenStreetMap2
 import Base.test

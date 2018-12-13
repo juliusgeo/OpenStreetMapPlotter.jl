@@ -1,4 +1,4 @@
-module OpenStreetMapParser2
+module OpenStreetMap2
 using LightXML
 using HTTP
 using Winston

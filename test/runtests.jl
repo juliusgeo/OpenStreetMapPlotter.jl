@@ -1,7 +1,7 @@
 #!/usr/bin/env julia
  
 #Start Test Script
-using OpenStreetMapParser2
+using OpenStreetMap2
 import Test
 using Pkg
 # Run tests
