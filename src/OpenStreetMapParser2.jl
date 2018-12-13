@@ -2,7 +2,6 @@ module OpenStreetMapParser2
 using LightXML
 using HTTP
 using Winston
-using Statistics
 include("structs.jl")
 include("styles.jl")
 
@@ -176,6 +175,9 @@ function is_less(a, b, center)
 	d1 = (a.x - center[1]) * (a.x - center[1]) + (a.y - center[2]) * (a.y - center[2])
 	d2 = (b.x - center[1]) * (b.x - center[1]) + (b.y - center[2]) * (b.y - center[2])
 	return d1 > d2
+end
+function mean(array::AbstractArray)
+	return sum(array)/length(array)
 end
 function center_of_points(nodes::Array{Node})
 	return (mean([i.x for i in nodes]), mean([i.y for i in nodes]))

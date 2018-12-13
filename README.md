@@ -28,6 +28,6 @@ julia> xml, bbox = open_file("map2.osm")
 julia> way_arr = parse_ways(xml)
 
 #plot it
-julia> plot_ways(way_arr, bbox)
+julia> plot_ways(way_arr, bbox=bbox)
 ```
 ![Example map of West Philadelphia](./map_out.svg)
