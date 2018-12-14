@@ -1,5 +1,5 @@
-name = "OpenStreetMap2"
-uuid = "47e3e129-0ffd-5e04-8e2f-43f7f7e39a9c"
+name = "OpenStreetMapPlotter"
+uuid = "d6bdb76f-3f24-5663-92cb-89259f3f1dc3"
 authors = ["Julius Park <juliusgeo@gmail.com>"]
 version = "0.0.1"
 

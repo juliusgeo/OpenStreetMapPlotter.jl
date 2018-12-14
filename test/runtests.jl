@@ -5,7 +5,7 @@ using OpenStreetMap2
 import Test
 using Pkg
 # Run tests
- 
+
 println("Testing xml parsing...")
 way_arr, bbox = parse_ways(open_file("west_philly.osm"))
 test_nodes = way_arr[1].nodes[1:10]
