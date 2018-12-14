@@ -15,8 +15,8 @@ The main ways in which this package improves on OpenStreetMap.jl:
 The styling for all the different object types is defined in styles.jl, which is composed of a few dictionaries that map OSM tags to Style objects. These dicts are accessible to the user, so you can easily change the styling as you wish.
 
 ### Planned Features
-	* ability to export to QGIS
-	* better theming options
+* Ability to export to QGIS
+* Better theming options
 
 ## Example
 ```julia

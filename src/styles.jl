@@ -422,14 +422,13 @@ tag2style = Dict(
 	"nature" => nature_styles,
 	"amenity" => amenity_styles,
 )
-
-function get_way_style(tags::Dict)
-	for tag in ["waterway", "building", "amenity", "highway", "leisure", "nature"]
-		if haskey(tags, tag)
-			if haskey(tag2style[tag], tags[tag])
-				return tag2style[tag][tags[tag]]
-			end
-		end
-	end
-	return Style(0xD3D3D3, 1, "-", false)
-end
+function get_way_style(tags::Dict, theme::Theme)
+        for tag in ["waterway", "building", "amenity", "highway", "leisure", "nature"]
+            if haskey(tags, tag)
+                if haskey(theme.tag2style[tag], tags[tag])
+                    return theme.tag2style[tag][tags[tag]]
+                end
+            end
+        end
+        return Style(0xD3D3D3, 1, "-", false)
+    end

@@ -1,4 +1,4 @@
-module OpenStreetMap2
+module OpenStreetMapPlotter
 using LightXML
 using HTTP
 using Winston
@@ -105,7 +105,7 @@ function parse_relations(xroot::XMLElement, way_arr::Array{Way}, node_arr::Array
     return rel_arr
 end
 
-function plot_ways(way_arr::Array{Way}; bbox::Tuple = nothing, width::Int64=500, roads_only::Bool=false)
+function plot_ways(way_arr::Array{Way}, bbox::Tuple; width::Int64=500, roads_only::Bool=false, theme::Theme=Theme("default", tag2style))
 	minlon = bbox[1]
 	maxlon = bbox[3]
 	minlat = bbox[2]
@@ -114,12 +114,11 @@ function plot_ways(way_arr::Array{Way}; bbox::Tuple = nothing, width::Int64=500,
     range_y = maxlat - minlat
     range_x = maxlon - minlon
 	aspect_ratio = range_x * c_adj / range_y
-
 	fignum = Winston.figure(name="OpenStreetMap Plot", width=width, height=round(Int, width/aspect_ratio))
 	p = FramedPlot()
 	draw_later = []
 	for way in way_arr
-		style=get_way_style(way.tags)
+		style=get_way_style(way.tags, theme)
 		if way.nodes[1] == way.nodes[end]
 			style.polygon = true
 		else
@@ -143,7 +142,7 @@ function plot_ways(way_arr::Array{Way}; bbox::Tuple = nothing, width::Int64=500,
     	end
     end
     for way in draw_later
-    	style=get_way_style(way.tags)
+    	style=get_way_style(way.tags, theme)
     	if way.nodes[1] == way.nodes[end]
 			style.polygon = true
 		else

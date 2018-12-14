@@ -1,7 +1,7 @@
 #!/usr/bin/env julia
  
 #Start Test Script
-using OpenStreetMap2
+using OpenStreetMapPlotter
 import Test
 using Pkg
 # Run tests
@@ -21,4 +21,4 @@ Test.@test test_nodes[9].id == "1288458923"
 Test.@test test_nodes[10].id == "27149002"
 Test.@test way_arr[1].tags == Dict{Any,Any}("name"=>"Schuylkill River","waterway"=>"river")
 Test.@time save_json(way_arr, "test.geojson") 
-plot_ways(way_arr, bbox=bbox)
+plot_ways(way_arr, bbox)
