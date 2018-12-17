@@ -1,17 +1,22 @@
 function parse_css(filepath::String)
 	open(filepath) do file
+		pos = 0
+		
 		while !eof(file)
-				str = readuntil(file, '{')
-				match_selector = match(r"([a-z]+)(\[.+?\])*", str)
-				show(match_selector)
+				str = readuntil(file, '}')
+				match_selector = match(r"([a-z]+)\s*?({|\[)", str)
+				print(match_selector[1])
+				for i in eachmatch(r"\[.+?\]", str)
+					if i != nothing
+						print(i.match)
+					end	
+				end
 				println()
-				str = readuntil(file, ';')
-				while(occursin(r"([a-z]+?):(.+)", str))
-					match_properties = match(r"([a-z]+?):(.+)", str)
-					show(match_properties)
-					println()
-					str = readuntil(file, ';')
-				end	
+				for m in eachmatch(r"([a-z]+?):(.+?);", str)
+					tag = m[1]
+					val = m[2]
+					println("\t"*tag*": "*val)
+				end
 		end
 	end
 end
