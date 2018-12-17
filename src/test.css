@@ -1,0 +1,8 @@
+way
+{ color:black; width:4; opacity:1; }
+
+way[tunnel][tunnel!=no]
+{ opacity:0.3; }
+
+way[highway=motorway]
+{ width:12; }
