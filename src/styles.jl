@@ -424,23 +424,31 @@ tag2style = Dict(
 )
 function get_way_style(tags::Dict, theme::Theme, cascade::Array{Any})
 		if cascade != []
+			style = Style(0xD3D3D3, 1, "-", false)
 			for rule in cascade
 				d = rule[2]
-				println(tags, d)
 				for i in keys(d)
 					if haskey(tags, i)
 						operator = d[i][2]
 						if operator == "="
 							operator = "=="
 						end
-						eval_statement = "\""*tags[i]*"\""*operator*"\""*d[i][1]*"\""
+						if tryparse(Float64, tags[i]) != nothing && tryparse(Float64, d[i][1]) !=nothing
+							eval_statement = tags[i]*operator*d[i][1]
+						else 
+							eval_statement = "\""*tags[i]*"\""*operator*"\""*d[i][1]*"\""
+						end
 						println(eval_statement)
-						println(eval(Meta.parse(eval_statement)))
+						if eval(Meta.parse(eval_statement)) == true
+							println("Rule style applied")
+							style = rule[end]
+						end
 					end
 				end
-
 			end
+			return style
 		end
+
         for tag in ["waterway", "building", "amenity", "highway", "leisure", "nature"]
             if haskey(tags, tag)
                 if haskey(theme.tag2style[tag], tags[tag])

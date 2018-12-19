@@ -7,3 +7,6 @@ way[tunnel][tunnel!=no]
 
 way[highway=motorway]
 { width:12; }
+
+way[population>50000]
+{ width:12; }
