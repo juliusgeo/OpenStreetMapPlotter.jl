@@ -422,7 +422,25 @@ tag2style = Dict(
 	"nature" => nature_styles,
 	"amenity" => amenity_styles,
 )
-function get_way_style(tags::Dict, theme::Theme)
+function get_way_style(tags::Dict, theme::Theme, cascade::Array{Any})
+		if cascade != []
+			for rule in cascade
+				d = rule[2]
+				println(tags, d)
+				for i in keys(d)
+					if haskey(tags, i)
+						operator = d[i][2]
+						if operator == "="
+							operator = "=="
+						end
+						eval_statement = "\""*tags[i]*"\""*operator*"\""*d[i][1]*"\""
+						println(eval_statement)
+						println(eval(Meta.parse(eval_statement)))
+					end
+				end
+
+			end
+		end
         for tag in ["waterway", "building", "amenity", "highway", "leisure", "nature"]
             if haskey(tags, tag)
                 if haskey(theme.tag2style[tag], tags[tag])

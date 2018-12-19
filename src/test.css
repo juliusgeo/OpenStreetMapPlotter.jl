@@ -1,6 +1,7 @@
 way
+{ color:0x000000; width:4; opacity:1; }
+way
 { color:black; width:4; opacity:1; }
-
 way[tunnel][tunnel!=no]
 { opacity:0.3; }
 

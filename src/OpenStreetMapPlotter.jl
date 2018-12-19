@@ -4,7 +4,7 @@ using HTTP
 using Winston
 include("structs.jl")
 include("styles.jl")
-
+include("MapCSSParser.jl")
 function open_file(filepath::String)
 	xdoc = parse_file(filepath)
 	xroot = root(xdoc)  # an instance of XMLElement
@@ -105,7 +105,7 @@ function parse_relations(xroot::XMLElement, way_arr::Array{Way}, node_arr::Array
     return rel_arr
 end
 
-function plot_ways(way_arr::Array{Way}, bbox::Tuple; width::Int64=500, roads_only::Bool=false, theme::Theme=Theme("default", tag2style))
+function plot_ways(way_arr::Array{Way}, bbox::Tuple; width::Int64=500, roads_only::Bool=false, theme::Theme=Theme("default", tag2style), css_file_name::String="")
 	minlon = bbox[1]
 	maxlon = bbox[3]
 	minlat = bbox[2]
@@ -117,8 +117,13 @@ function plot_ways(way_arr::Array{Way}, bbox::Tuple; width::Int64=500, roads_onl
 	fignum = Winston.figure(name="OpenStreetMap Plot", width=width, height=round(Int, width/aspect_ratio))
 	p = FramedPlot()
 	draw_later = []
+	cascade = []
+	if css_file_name != ""
+		cascade = parse_css(css_file_name)
+	end 
+	
 	for way in way_arr
-		style=get_way_style(way.tags, theme)
+		style=get_way_style(way.tags, theme, cascade)
 		if way.nodes[1] == way.nodes[end]
 			style.polygon = true
 		else
@@ -142,7 +147,7 @@ function plot_ways(way_arr::Array{Way}, bbox::Tuple; width::Int64=500, roads_onl
     	end
     end
     for way in draw_later
-    	style=get_way_style(way.tags, theme)
+    	style=get_way_style(way.tags, theme, cascade)
     	if way.nodes[1] == way.nodes[end]
 			style.polygon = true
 		else

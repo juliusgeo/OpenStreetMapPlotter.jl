@@ -5,7 +5,7 @@ struct Node
 end
 
 mutable struct Style
-	color::UInt
+	color::Union{UInt32, Int64, String}
 	width::Int
 	spec::String
     polygon::Bool
