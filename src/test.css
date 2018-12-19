@@ -1,12 +1,6 @@
-way
-{ color:0x000000; width:4; opacity:1; }
-way
-{ color:black; width:4; opacity:1; }
-way[tunnel][tunnel!=no]
-{ opacity:0.3; }
-
 way[highway=motorway]
-{ width:12; }
-
+{ width:10; color:black;}
+way[highway]
+{width: 12; color:black;}
 way[population>=50000]
 { width:12; }

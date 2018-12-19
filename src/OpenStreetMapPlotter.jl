@@ -124,6 +124,9 @@ function plot_ways(way_arr::Array{Way}, bbox::Tuple; width::Int64=500, roads_onl
 	
 	for way in way_arr
 		style=get_way_style(way.tags, theme, cascade)
+		if style == nothing
+			continue
+		end
 		if way.nodes[1] == way.nodes[end]
 			style.polygon = true
 		else
@@ -148,6 +151,9 @@ function plot_ways(way_arr::Array{Way}, bbox::Tuple; width::Int64=500, roads_onl
     end
     for way in draw_later
     	style=get_way_style(way.tags, theme, cascade)
+    	if style == nothing
+    		continue
+    	end
     	if way.nodes[1] == way.nodes[end]
 			style.polygon = true
 		else

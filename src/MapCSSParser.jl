@@ -1,3 +1,4 @@
+
 function parse_css(filepath::String)
 	open(filepath) do file		
 		out = []
@@ -20,7 +21,7 @@ function parse_css(filepath::String)
 					end	
 				end
 				push!(ind_out,selector_dict)
-				color = 0xFFFFFF
+				color = 0xD3D3D3
 				width = 0
 				spec = "-"
 				polygon = false
