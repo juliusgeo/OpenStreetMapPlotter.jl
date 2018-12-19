@@ -424,7 +424,7 @@ tag2style = Dict(
 )
 function get_way_style(tags::Dict, theme::Theme, cascade::Array{Any})
 		if cascade != []
-			style = Style(0xD3D3D3, 1, "-", false)
+			style = Style(0xD3D3D3, 0, "-", false)
 			for rule in cascade
 				d = rule[2]
 				for i in keys(d)
