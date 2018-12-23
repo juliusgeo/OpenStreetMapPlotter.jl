@@ -17,7 +17,16 @@ The styling for all the different object types is defined in styles.jl, which is
 ### Planned Features
 * Ability to export to QGIS
 * Better theming options
-
+## MapCSS Support
+Currently, OpenStreetMapPlotter.jl supports a subset of [MapCSS](https://wiki.openstreetmap.org/wiki/MapCSS/0.2) features. The only attributes which can be set are width and color, but ways can be filtered by what tags they have and also by the values of those tags. Example:
+```CSS
+way[highway]
+{width: 2; color:black;}
+way[highway!=motorway]
+{ width:2; color:green;}
+```
+Supported operators are: !=, =, <=, >=, >, <.
+Note: the statements in the CSS file are executed sequentially, so later statements will override earlier statements
 ## Example
 ```julia
 #open a file from bounding box...
@@ -31,5 +40,7 @@ julia> way_arr = parse_ways(xml)
 
 #plot it
 julia> plot_ways(way_arr, bbox=bbox)
+#or plot it using a CSS file to define the appearance
+julia> plot_ways(way_arr, bbox, css_file_name="src/test.css")
 ```
 ![Example map of West Philadelphia](./map_out.svg)
