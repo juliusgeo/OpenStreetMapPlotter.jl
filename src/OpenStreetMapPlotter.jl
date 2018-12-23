@@ -115,7 +115,9 @@ function plot_ways(way_arr::Array{Way}, bbox::Tuple; width::Int64=500, roads_onl
     range_x = maxlon - minlon
 	aspect_ratio = range_x * c_adj / range_y
 	fignum = Winston.figure(name="OpenStreetMap Plot", width=width, height=round(Int, width/aspect_ratio))
-	p = FramedPlot()
+	p = FramedPlot(xrange = (minlon, maxlon), yrange = (minlat, maxlat))
+#	p.xrange = (minlon, maxlon)
+#	p.yrange = (minlat, maxlat)
 	draw_later = []
 	cascade = []
 	if css_file_name != ""
@@ -132,21 +134,24 @@ function plot_ways(way_arr::Array{Way}, bbox::Tuple; width::Int64=500, roads_onl
 		else
 			style.polygon = false
 		end
+		f = nothing
 		if style.polygon == true
 			split = findmax([i.x for i in way.nodes])[2]
 			start = findmin([i.x for i in way.nodes])[2]
 			topside = way.nodes[1:split]
 			bottomside = way.nodes[split:end]
 			f = FillBetween([i.x for i in topside], [i.y for i in topside], [i.x for i in bottomside], [i.y for i in bottomside], fillcolor = style.color, linewidth=style.width)
-			Winston.add(p, f)
 		elseif haskey(way.tags, "highway")
 			if way.tags["highway"] in ["motorway", "trunk", "primary", "secondary", "tertiary"]
 				push!(draw_later, way)
 			else
-				plot(p, [i.x for i in way.nodes], [i.y for i in way.nodes], style.spec, color=style.color, linewidth=style.width, xrange=(minlon, maxlon), yrange=(minlat, maxlat))
+				f = Curve([i.x for i in way.nodes], [i.y for i in way.nodes], color=style.color, linewidth=style.width)
 			end
 		elseif roads_only == false
-    		plot(p, [i.x for i in way.nodes], [i.y for i in way.nodes], style.spec, color=style.color, linewidth=style.width, xrange=(minlon, maxlon), yrange=(minlat, maxlat))
+    		f = Curve([i.x for i in way.nodes], [i.y for i in way.nodes],color=style.color, linewidth=style.width)
+    	end
+    	if f !=nothing
+    		Winston.add(p, f)
     	end
     end
     for way in draw_later
@@ -159,7 +164,8 @@ function plot_ways(way_arr::Array{Way}, bbox::Tuple; width::Int64=500, roads_onl
 		else
 			style.polygon = false
 		end
-    	plot(p, [i.x for i in way.nodes], [i.y for i in way.nodes], style.spec, color=style.color, linewidth=style.width, xrange=(minlon, maxlon), yrange=(minlat, maxlat))
+		f = Curve([i.x for i in way.nodes], [i.y for i in way.nodes],color=style.color, linewidth=style.width)
+    	Winston.add(p, f)
     end
     #savefig(p, "map_out.svg", width=width, height=round(Int, width/aspect_ratio))
     display(p)

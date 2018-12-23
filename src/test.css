@@ -1,6 +1,6 @@
-way[highway=motorway]
-{ width:10; color:black;}
+way[highway!=motorway]
+{ width:2; color:green;}
 way[highway]
-{width: 12; color:black;}
+{width: 2; color:black;}
 way[population>=50000]
 { width:12; }
