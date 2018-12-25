@@ -118,7 +118,7 @@ function plot_ways(way_arr::Array{Way}, bbox::Tuple; width::Int64=500, theme::Th
 	p = FramedPlot(xrange = (minlon, maxlon), yrange = (minlat, maxlat))
 #	p.xrange = (minlon, maxlon)
 #	p.yrange = (minlat, maxlat)
-	layers = Vector{Way}[[],[],[],[],[],[],[],[],[],[]]
+	layers = Vector{Way}[[],[],[],[],[],[],[],[],[],[],[]]
 	draw_later = []
 	cascade = []
 	if css_file_name != ""
@@ -127,29 +127,23 @@ function plot_ways(way_arr::Array{Way}, bbox::Tuple; width::Int64=500, theme::Th
 	for way in way_arr
 		if haskey(way.tags, "layer")
 			l = tryparse(Int, way.tags["layer"])
-			println(l)
 			if l == nothing
 				println("invalid layer tag")
 			else
-				println([i.id for i in layers[l+6]])
 				push!(layers[l+6], way)
 			end
 		end
 		if haskey(way.tags, "highway")
 				if way.tags["highway"] in ["motorway", "trunk", "primary", "secondary", "tertiary"]
-					push!(layers[9], way)
+					push!(layers[8], way)
 				else
-					push!(layers[6], way)
+					push!(layers[7], way)
 				end
-			else
-				push!(layers[1], way)
+		else
+			push!(layers[6], way)
 		end
 	end
-	println([size(i) for i in layers])
 	for layer in layers
-		print("drawing layer ")
-
-		println([i.tags["highway"] for i in layer if haskey(i.tags, "highway")])
 		for way in layer
 			style=get_way_style(way.tags, theme, cascade)
 			if style == nothing
