@@ -105,7 +105,7 @@ function parse_relations(xroot::XMLElement, way_arr::Array{Way}, node_arr::Array
     return rel_arr
 end
 
-function plot_ways(way_arr::Array{Way}, bbox::Tuple; width::Int64=500, theme::Theme=Theme("default", tag2style), css_file_name::String="")
+function plot_ways(way_arr::Array{Way}, bbox::Tuple; width::Int64=900, theme::Theme=Theme("default", tag2style), css_file_name::String="")
 	minlon = bbox[1]
 	maxlon = bbox[3]
 	minlat = bbox[2]
@@ -114,7 +114,7 @@ function plot_ways(way_arr::Array{Way}, bbox::Tuple; width::Int64=500, theme::Th
     range_y = maxlat - minlat
     range_x = maxlon - minlon
 	aspect_ratio = range_x * c_adj / range_y
-	fignum = Winston.figure(name="OpenStreetMap Plot", width=width*2, height=round(Int, width*2/aspect_ratio))
+	fignum = Winston.figure(name="OpenStreetMap Plot", width=width, height=round(Int, width/aspect_ratio))
 	p = FramedPlot(xrange = (minlon, maxlon), yrange = (minlat, maxlat))
 #	p.xrange = (minlon, maxlon)
 #	p.yrange = (minlat, maxlat)
@@ -156,21 +156,23 @@ function plot_ways(way_arr::Array{Way}, bbox::Tuple; width::Int64=500, theme::Th
 			end
 			f = nothing
 			if style.polygon == true
-				split = findmax([i.x for i in way.nodes])[2]
-				start = findmin([i.x for i in way.nodes])[2]
+				split = split_polygon(way.nodes)
 				topside = way.nodes[1:split]
 				bottomside = way.nodes[split:end]
 				f = FillBetween([i.x for i in topside], [i.y for i in topside], [i.x for i in bottomside], [i.y for i in bottomside], fillcolor = style.color, linewidth=style.width)
 			else
 				f = Curve([i.x for i in way.nodes], [i.y for i in way.nodes], color=style.color, linewidth=style.width)
 			end
-	    	if f !=nothing
+	    	if f != nothing
 	    		Winston.add(p, f)
 	    	end
 		end 
 	end
     savefig(p, "map_out.svg", width=width, height=round(Int, width/aspect_ratio))
     display(p)
+end
+function split_polygon(nodes::Array{Node})
+	return findmax([i.x for i in nodes])[2]
 end
 function sort_counterclockwise(nodes::Array{Node})
 	center = center_of_points(nodes)
