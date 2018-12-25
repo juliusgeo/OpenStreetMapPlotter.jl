@@ -1,12 +1,17 @@
-
 function parse_css(filepath::String)
 	open(filepath) do file		
 		out = []
+
 		while !eof(file)
 				ind_out = []
 				selector_dict = Dict()
 				str = readuntil(file, '}')
 				match_selector = match(r"([a-z]+)\s*?({|\[)", str)
+				if match_selector == nothing
+					continue
+				end
+				show(match_selector)
+				println(match_selector[1])
 				selector = match_selector[1]
 				push!(ind_out,selector)
 				for i in eachmatch(r"((?<=\[).+?(?=\]))", str)

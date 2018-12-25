@@ -105,7 +105,7 @@ function parse_relations(xroot::XMLElement, way_arr::Array{Way}, node_arr::Array
     return rel_arr
 end
 
-function plot_ways(way_arr::Array{Way}, bbox::Tuple; width::Int64=500, roads_only::Bool=false, theme::Theme=Theme("default", tag2style), css_file_name::String="")
+function plot_ways(way_arr::Array{Way}, bbox::Tuple; width::Int64=500, theme::Theme=Theme("default", tag2style), css_file_name::String="")
 	minlon = bbox[1]
 	maxlon = bbox[3]
 	minlat = bbox[2]
@@ -114,60 +114,68 @@ function plot_ways(way_arr::Array{Way}, bbox::Tuple; width::Int64=500, roads_onl
     range_y = maxlat - minlat
     range_x = maxlon - minlon
 	aspect_ratio = range_x * c_adj / range_y
-	fignum = Winston.figure(name="OpenStreetMap Plot", width=width, height=round(Int, width/aspect_ratio))
+	fignum = Winston.figure(name="OpenStreetMap Plot", width=width*2, height=round(Int, width*2/aspect_ratio))
 	p = FramedPlot(xrange = (minlon, maxlon), yrange = (minlat, maxlat))
 #	p.xrange = (minlon, maxlon)
 #	p.yrange = (minlat, maxlat)
+	layers = Vector{Way}[[],[],[],[],[],[],[],[],[],[]]
 	draw_later = []
 	cascade = []
 	if css_file_name != ""
 		cascade = parse_css(css_file_name)
 	end 
-	
 	for way in way_arr
-		style=get_way_style(way.tags, theme, cascade)
-		if style == nothing
-			continue
+		if haskey(way.tags, "layer")
+			l = tryparse(Int, way.tags["layer"])
+			println(l)
+			if l == nothing
+				println("invalid layer tag")
+			else
+				println([i.id for i in layers[l+6]])
+				push!(layers[l+6], way)
+			end
 		end
-		if way.nodes[1] == way.nodes[end]
-			style.polygon = true
-		else
-			style.polygon = false
+		if haskey(way.tags, "highway")
+				if way.tags["highway"] in ["motorway", "trunk", "primary", "secondary", "tertiary"]
+					push!(layers[9], way)
+				else
+					push!(layers[6], way)
+				end
+			else
+				push!(layers[1], way)
 		end
-		f = nothing
-		if style.polygon == true
-			split = findmax([i.x for i in way.nodes])[2]
-			start = findmin([i.x for i in way.nodes])[2]
-			topside = way.nodes[1:split]
-			bottomside = way.nodes[split:end]
-			f = FillBetween([i.x for i in topside], [i.y for i in topside], [i.x for i in bottomside], [i.y for i in bottomside], fillcolor = style.color, linewidth=style.width)
-		elseif haskey(way.tags, "highway")
-			if way.tags["highway"] in ["motorway", "trunk", "primary", "secondary", "tertiary"]
-				push!(draw_later, way)
+	end
+	println([size(i) for i in layers])
+	for layer in layers
+		print("drawing layer ")
+
+		println([i.tags["highway"] for i in layer if haskey(i.tags, "highway")])
+		for way in layer
+			style=get_way_style(way.tags, theme, cascade)
+			if style == nothing
+				continue
+			end
+			if way.nodes[1] == way.nodes[end]
+				style.polygon = true
+			else
+				style.polygon = false
+			end
+			f = nothing
+			if style.polygon == true
+				split = findmax([i.x for i in way.nodes])[2]
+				start = findmin([i.x for i in way.nodes])[2]
+				topside = way.nodes[1:split]
+				bottomside = way.nodes[split:end]
+				f = FillBetween([i.x for i in topside], [i.y for i in topside], [i.x for i in bottomside], [i.y for i in bottomside], fillcolor = style.color, linewidth=style.width)
 			else
 				f = Curve([i.x for i in way.nodes], [i.y for i in way.nodes], color=style.color, linewidth=style.width)
 			end
-		elseif roads_only == false
-    		f = Curve([i.x for i in way.nodes], [i.y for i in way.nodes],color=style.color, linewidth=style.width)
-    	end
-    	if f !=nothing
-    		Winston.add(p, f)
-    	end
-    end
-    for way in draw_later
-    	style=get_way_style(way.tags, theme, cascade)
-    	if style == nothing
-    		continue
-    	end
-    	if way.nodes[1] == way.nodes[end]
-			style.polygon = true
-		else
-			style.polygon = false
-		end
-		f = Curve([i.x for i in way.nodes], [i.y for i in way.nodes],color=style.color, linewidth=style.width)
-    	Winston.add(p, f)
-    end
-    #savefig(p, "map_out.svg", width=width, height=round(Int, width/aspect_ratio))
+	    	if f !=nothing
+	    		Winston.add(p, f)
+	    	end
+		end 
+	end
+    savefig(p, "map_out.svg", width=width, height=round(Int, width/aspect_ratio))
     display(p)
 end
 function sort_counterclockwise(nodes::Array{Node})
