@@ -116,7 +116,6 @@ function plot_ways(way_arr::Array{Way}, bbox::Tuple; width::Int64=900, theme::Th
 	aspect_ratio = range_x * c_adj / range_y
 	fignum = Winston.figure(name="OpenStreetMap Plot", width=width, height=round(Int, width/aspect_ratio))
 	p = FramedPlot(xrange = (minlon, maxlon), yrange = (minlat, maxlat))
-	println(p)
 	p.attr[:gutter] = 0
 	p.attr[:title_style][:fontsize] = 1
 	p.x1.attr[:ticklabels_style][:fontsize] = 1

@@ -11,7 +11,6 @@ function parse_css(filepath::String)
 					continue
 				end
 				show(match_selector)
-				println(match_selector[1])
 				selector = match_selector[1]
 				push!(ind_out,selector)
 				for i in eachmatch(r"((?<=\[).+?(?=\]))", str)

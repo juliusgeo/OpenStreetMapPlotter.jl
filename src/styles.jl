@@ -433,7 +433,6 @@ function get_way_style(tags::Dict, theme::Theme, cascade::Array{Any})
 				for i in keys(d)
 					if haskey(tags, i)
 						if d[i][1] == "yes"
-							println(i*" "*tags[i]*"...style applied")
 							style = rule[end]
 						end
 						operator = d[i][2]
@@ -441,12 +440,11 @@ function get_way_style(tags::Dict, theme::Theme, cascade::Array{Any})
 							operator = "=="
 						end
 						if tryparse(Float64, tags[i]) != nothing && tryparse(Float64, d[i][1]) !=nothing
-							eval_statement = tags[i]*operator*d[i][1]
+							eval_statement = "$(tags[i])$(operator)$(d[i][1])"
 						else 
-							eval_statement = "\""*tags[i]*"\""*operator*"\""*d[i][1]*"\""
+							eval_statement = "\"$(tags[i])\"$(operator)\"$(d[i][1])\""
 						end
 						if eval(Meta.parse(eval_statement)) == true
-							println(eval_statement*"...style applied")
 							style = rule[end]
 						end
 					end
