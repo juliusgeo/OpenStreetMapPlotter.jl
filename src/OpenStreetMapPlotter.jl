@@ -105,7 +105,7 @@ function parse_relations(xroot::XMLElement, way_arr::Array{Way}, node_arr::Array
     return rel_arr
 end
 
-function plot_ways(way_arr::Array{Way}, bbox::Tuple; width::Int64=900, theme::Theme=Theme("default", tag2style), css_file_name::String="")
+function plot_ways(way_arr::Array{Way}, bbox::Tuple; width::Int64=900, css_file_name::String="")
 	minlon = bbox[1]
 	maxlon = bbox[3]
 	minlat = bbox[2]
@@ -153,7 +153,7 @@ function plot_ways(way_arr::Array{Way}, bbox::Tuple; width::Int64=900, theme::Th
 	end
 	for layer in layers
 		for way in layer
-			style=get_way_style(way.tags, theme, cascade)
+			style=get_way_style(way.tags, cascade)
 			if style == nothing
 				continue
 			end

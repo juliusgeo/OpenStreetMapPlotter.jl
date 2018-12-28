@@ -11,12 +11,6 @@ mutable struct Style
     polygon::Bool
 end
 
-struct Theme
-    name::String
-    tag2style::Dict{Any, Any}
-    Theme(name::String, tag2style) = new(name, tag2style)
-end
-
 mutable struct Way
     id::String
     visible::Bool

@@ -422,7 +422,7 @@ tag2style = Dict(
 	"nature" => nature_styles,
 	"amenity" => amenity_styles,
 )
-function get_way_style(tags::Dict, theme::Theme, cascade::Array{Any})
+function get_way_style(tags::Dict, cascade::Array{Any})
 		if cascade != []
 			style = nothing
 			for rule in cascade
@@ -454,8 +454,8 @@ function get_way_style(tags::Dict, theme::Theme, cascade::Array{Any})
 		end
         for tag in ["waterway", "building", "amenity", "highway", "leisure", "nature"]
             if haskey(tags, tag)
-                if haskey(theme.tag2style[tag], tags[tag])
-                    return theme.tag2style[tag][tags[tag]]
+                if haskey(tag2style[tag], tags[tag])
+                    return tag2style[tag][tags[tag]]
                 end
             end
         end
