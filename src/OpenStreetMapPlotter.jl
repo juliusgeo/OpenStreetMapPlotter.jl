@@ -105,7 +105,7 @@ function parse_relations(xroot::XMLElement, way_arr::Array{Way}, node_arr::Array
     return rel_arr
 end
 
-function plot_ways(way_arr::Array{Way}, bbox::Tuple; width::Int64=900, css_file_name::String="")
+function plot_ways(way_arr::Array{Way}, bbox::Tuple; width::Int64=900, css_file_name::String="", draw_labels::Bool=false)
 	minlon = bbox[1]
 	maxlon = bbox[3]
 	minlat = bbox[2]
@@ -151,6 +151,8 @@ function plot_ways(way_arr::Array{Way}, bbox::Tuple; width::Int64=900, css_file_
 			push!(layers[6], way)
 		end
 	end
+	labels = []
+	way_areas = []
 	for layer in layers
 		for way in layer
 			style=get_way_style(way.tags, cascade)
@@ -167,6 +169,15 @@ function plot_ways(way_arr::Array{Way}, bbox::Tuple; width::Int64=900, css_file_
 				split = split_polygon(way.nodes)
 				topside = way.nodes[1:split]
 				bottomside = way.nodes[split:end]
+				if haskey(way.tags, "name")
+					c = center_of_points(way.nodes)
+					println(way.tags["name"], c)
+					c = ((c[1]-minlon)/range_x, (c[2]-minlat)/range_y)
+					cur_label = PlotLabel(c[1], c[2], replace(way.tags["name"], "&"=>"&amp;"), fontsize = .1)
+					cur_area = get_area(way.nodes)
+					push!(labels, cur_label)
+					push!(way_areas, cur_area)
+				end
 				f = FillBetween([i.x for i in topside], [i.y for i in topside], [i.x for i in bottomside], [i.y for i in bottomside], fillcolor = style.color, linewidth=style.width)
 			else
 				f = Curve([i.x for i in way.nodes], [i.y for i in way.nodes], color=style.color, linewidth=style.width)
@@ -175,6 +186,14 @@ function plot_ways(way_arr::Array{Way}, bbox::Tuple; width::Int64=900, css_file_
 	    		Winston.add(p, f)
 	    	end
 		end 
+	end
+	mean_of_areas = mean(way_areas)
+	if draw_labels == true
+		for (label, area) in zip(labels, way_areas)
+			if area > mean_of_areas
+				Winston.add(p, label)
+			end
+		end
 	end
     savefig(p, "map_out.svg", width=width, height=round(Int, width/aspect_ratio))
     display(p)
@@ -186,14 +205,19 @@ function sort_counterclockwise(nodes::Array{Node})
 	center = center_of_points(nodes)
 	return sort(nodes, lt=(a, b)->!is_less(a, b, center))
 end
-
+#taken from here: https://rosettacode.org/wiki/Shoelace_formula_for_polygonal_area#Julia
+shoelacearea(x, y) = abs(sum(i * j for (i, j) in zip(x, append!(y[2:end], y[1]))) - sum(i * j for (i, j) in zip(append!(x[2:end], x[1]), y))) / 2
+function get_area(nodes::Array{Node})
+	x = [i.x for i in nodes]
+	y = [i.y for i in nodes]
+	return shoelacearea(x, y)
+end
 function is_less(a, b, center)
 	if a.x-center[1] >= 0 && b.x-center[1] < 0
 		return true
 	elseif a.x -center[1] == 0 && b.x-center[1] == 0
 		return a.y >b.y
 	end
-
 	det = (a.x - center[1]) * (b.y - center[2]) - (b.x - center[2]) * (a.y - center[2])
 	if det < 0
 		return true
