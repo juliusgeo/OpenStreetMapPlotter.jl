@@ -2,6 +2,7 @@ module OpenStreetMapPlotter
 using LightXML
 using HTTP
 using Winston
+
 include("structs.jl")
 include("styles.jl")
 include("MapCSSParser.jl")
@@ -124,6 +125,7 @@ function plot_ways(way_arr::Array{Way}, bbox::Tuple; width::Int64=900, css_file_
 	p.y1.attr[:draw_subticks] = true
 	p.x1.attr[:ticks] = 10
 	p.y1.attr[:ticks] = 10
+	Winston._winston_config.defaults["fontsize_min"] = ".1"
 #	p.xrange = (minlon, maxlon)
 #	p.yrange = (minlat, maxlat)
 	layers = Vector{Way}[[],[],[],[],[],[],[],[],[],[],[]]
@@ -171,9 +173,8 @@ function plot_ways(way_arr::Array{Way}, bbox::Tuple; width::Int64=900, css_file_
 				bottomside = way.nodes[split:end]
 				if haskey(way.tags, "name")
 					c = center_of_points(way.nodes)
-					println(way.tags["name"], c)
 					c = ((c[1]-minlon)/range_x, (c[2]-minlat)/range_y)
-					cur_label = PlotLabel(c[1], c[2], replace(way.tags["name"], "&"=>"&amp;"), fontsize = .1)
+					cur_label = PlotLabel(c[1], c[2], replace(way.tags["name"], "&"=>"&amp;"), fontsize = .6)
 					cur_area = get_area(way.nodes)
 					push!(labels, cur_label)
 					push!(way_areas, cur_area)
@@ -190,7 +191,7 @@ function plot_ways(way_arr::Array{Way}, bbox::Tuple; width::Int64=900, css_file_
 	mean_of_areas = mean(way_areas)
 	if draw_labels == true
 		for (label, area) in zip(labels, way_areas)
-			if area > mean_of_areas
+			if area > mean_of_areas/2
 				Winston.add(p, label)
 			end
 		end
