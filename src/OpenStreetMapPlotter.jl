@@ -164,21 +164,22 @@ function plot_ways(way_arr::Array{Way}, bbox::Tuple; width::Int64=900, css_file_
 			else
 				style["is_polygon"] = false
 			end
+			if haskey(style, "text")
+				for i in keys(way.tags)
+					if occursin(i, style["text"])
+						c = center_of_points(way.nodes)
+						c = ((c[1]-minlon)/range_x, (c[2]-minlat)/range_y)
+						cur_label = PlotLabel(c[1], c[2], replace(way.tags[i], "&"=>"&amp;"), fontsize = style["font-size"])
+						push!(labels, cur_label)
+						break
+					end
+				end
+			end
 			f = nothing
 			if style["is_polygon"] == true
 				split = split_polygon(way.nodes)
 				topside = way.nodes[1:split]
 				bottomside = way.nodes[split:end]
-				if haskey(style, "text")
-					if haskey(way.tags, style["text"])
-						println(style)
-						println(way.tags)
-						c = center_of_points(way.nodes)
-						c = ((c[1]-minlon)/range_x, (c[2]-minlat)/range_y)
-						cur_label = PlotLabel(c[1], c[2], replace(way.tags[style["text"]], "&"=>"&amp;"), fontsize = style["font-size"])
-						push!(labels, cur_label)
-					end
-				end
 				f = FillBetween([i.x for i in topside], [i.y for i in topside], [i.x for i in bottomside], [i.y for i in bottomside], fillcolor = style["color"], linewidth=style["width"])
 			else
 				f = Curve([i.x for i in way.nodes], [i.y for i in way.nodes], color=style["color"], linewidth=style["width"])
