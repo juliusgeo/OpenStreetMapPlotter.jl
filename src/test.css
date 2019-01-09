@@ -1,6 +1,8 @@
 way[highway!=motorway]
+{}
+way[highway!=motorway]
 { width:5; color:green;}
 way[highway]
-{width: 2; color:black;}
+{width: 2; color:black; text:name;}
 
 

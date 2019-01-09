@@ -21,6 +21,7 @@ function open_bbox(bbox::Tuple)
 	r = HTTP.request("GET", url)
 	return root(parse_string(String(r.body)))
 end
+
 function parse_nodes(xroot::XMLElement)
     node_arr = Node[]
     for node in xroot["node"]
@@ -106,7 +107,7 @@ function parse_relations(xroot::XMLElement, way_arr::Array{Way}, node_arr::Array
     return rel_arr
 end
 
-function plot_ways(way_arr::Array{Way}, bbox::Tuple; width::Int64=900, css_file_name::String="", draw_labels::Bool=false)
+function plot_ways(way_arr::Array{Way}, bbox::Tuple; width::Int64=900, css_file_name::String="")
 	minlon = bbox[1]
 	maxlon = bbox[3]
 	minlat = bbox[2]
@@ -126,8 +127,6 @@ function plot_ways(way_arr::Array{Way}, bbox::Tuple; width::Int64=900, css_file_
 	p.x1.attr[:ticks] = 10
 	p.y1.attr[:ticks] = 10
 	Winston._winston_config.defaults["fontsize_min"] = ".1"
-#	p.xrange = (minlon, maxlon)
-#	p.yrange = (minlat, maxlat)
 	layers = Vector{Way}[[],[],[],[],[],[],[],[],[],[],[]]
 	draw_later = []
 	cascade = []
@@ -154,7 +153,6 @@ function plot_ways(way_arr::Array{Way}, bbox::Tuple; width::Int64=900, css_file_
 		end
 	end
 	labels = []
-	way_areas = []
 	for layer in layers
 		for way in layer
 			style=get_way_style(way.tags, cascade)
@@ -162,41 +160,38 @@ function plot_ways(way_arr::Array{Way}, bbox::Tuple; width::Int64=900, css_file_
 				continue
 			end
 			if way.nodes[1] == way.nodes[end]
-				style.polygon = true
+				style["is_polygon"] = true
 			else
-				style.polygon = false
+				style["is_polygon"] = false
 			end
 			f = nothing
-			if style.polygon == true
+			if style["is_polygon"] == true
 				split = split_polygon(way.nodes)
 				topside = way.nodes[1:split]
 				bottomside = way.nodes[split:end]
-				if haskey(way.tags, "name")
-					c = center_of_points(way.nodes)
-					c = ((c[1]-minlon)/range_x, (c[2]-minlat)/range_y)
-					cur_label = PlotLabel(c[1], c[2], replace(way.tags["name"], "&"=>"&amp;"), fontsize = .6)
-					cur_area = get_area(way.nodes)
-					push!(labels, cur_label)
-					push!(way_areas, cur_area)
+				if haskey(style, "text")
+					if haskey(way.tags, style["text"])
+						println(style)
+						println(way.tags)
+						c = center_of_points(way.nodes)
+						c = ((c[1]-minlon)/range_x, (c[2]-minlat)/range_y)
+						cur_label = PlotLabel(c[1], c[2], replace(way.tags[style["text"]], "&"=>"&amp;"), fontsize = style["font-size"])
+						push!(labels, cur_label)
+					end
 				end
-				f = FillBetween([i.x for i in topside], [i.y for i in topside], [i.x for i in bottomside], [i.y for i in bottomside], fillcolor = style.color, linewidth=style.width)
+				f = FillBetween([i.x for i in topside], [i.y for i in topside], [i.x for i in bottomside], [i.y for i in bottomside], fillcolor = style["color"], linewidth=style["width"])
 			else
-				f = Curve([i.x for i in way.nodes], [i.y for i in way.nodes], color=style.color, linewidth=style.width)
+				f = Curve([i.x for i in way.nodes], [i.y for i in way.nodes], color=style["color"], linewidth=style["width"])
 			end
 	    	if f != nothing
 	    		Winston.add(p, f)
 	    	end
 		end 
 	end
-	mean_of_areas = mean(way_areas)
-	if draw_labels == true
-		for (label, area) in zip(labels, way_areas)
-			if area > mean_of_areas/2
-				Winston.add(p, label)
-			end
-		end
+	println(labels)
+	for label in labels
+		Winston.add(p, label)
 	end
-    savefig(p, "map_out.svg", width=width, height=round(Int, width/aspect_ratio))
     display(p)
 end
 function split_polygon(nodes::Array{Node})

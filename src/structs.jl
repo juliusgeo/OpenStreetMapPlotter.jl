@@ -4,13 +4,6 @@ struct Node
     id::String
 end
 
-mutable struct Style
-	color::Union{UInt32, Int64, String}
-	width::Int
-	spec::String
-    polygon::Bool
-end
-
 mutable struct Way
     id::String
     visible::Bool

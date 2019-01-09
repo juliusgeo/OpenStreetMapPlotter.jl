@@ -1,7 +1,6 @@
 function parse_css(filepath::String)
 	open(filepath) do file		
 		out = []
-
 		while !eof(file)
 				ind_out = []
 				selector_dict = Dict()
@@ -22,33 +21,48 @@ function parse_css(filepath::String)
 						else
 							selector_dict[i.match] = ("yes", "=")
 						end
-					end	
+					end
 				end
 				push!(ind_out,selector_dict)
-				color = 0xD3D3D3
-				width = 0
-				spec = "-"
-				polygon = false
+				cur_style = Dict("color"=>0xD3D3D3, "width"=>0, "spec"=>"-", "is_polygon"=>false, "font-size"=>.6)
 				for m in eachmatch(r"([a-z]+?):(.+?);", str)
 					tag = m[1]
 					val = m[2]
 					if(tag == "color")
-						color = tryparse(Int, val)
-						if(color == nothing)
-							color = String(val)
+						cur_style["color"] = tryparse(Int, val)
+						if(cur_style["color"]  == nothing)
+							cur_style["color"]  = String(val)
 						end
 					end
 					if(tag == "width")
-						width = tryparse(Int, val)
-						if(width == nothing)
-							width = 1
+						cur_style["width"] = tryparse(Int, val)
+						if(cur_style["width"] == nothing)
+							cur_style["width"] = 1
 						end
 					end
+					if(tag == "font-size")
+						cur_style["font-size"] = tryparse(Float64, val)
+					end
+					if(tag == "text")
+						cur_style["text"] = val
+					end
 				end
-				push!(ind_out, Style(color, width, spec, polygon))
+				push!(ind_out, cur_style)
 				tupleized=tuple(ind_out...)
 				push!(out, tupleized)
 		end
+				println()
+		println()
+		println()
+
+		for i in out
+			println("Rule:")
+			println(i)
+		end
+				println()
+		println()
+		println()
+
 		return out
 	end
 end
