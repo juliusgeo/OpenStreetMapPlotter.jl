@@ -33,13 +33,13 @@ Note: the statements in the CSS file are executed sequentially, so later stateme
 julia> bbox = (-75.2262,39.9365,-75.1327, 39.9821)
 julia> xml = open_bbox(bbox)
 #or from a file
-julia> xml, bbox = open_file("map2.osm")
+julia> xml = open_file("map2.osm")
 
 #parse the ways
-julia> way_arr = parse_ways(xml)
+julia> way_arr, bbox = parse_ways(xml)
 
 #plot it
-julia> plot_ways(way_arr, bbox=bbox)
+julia> plot_ways(way_arr, bbox)
 #or plot it using a CSS file to define the appearance
 julia> plot_ways(way_arr, bbox, css_file_name="src/test.css")
 ```
